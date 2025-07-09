@@ -40,6 +40,7 @@
     .slot-cell img {
       width: 60px;
       height: 60px;
+      object-fit: contain;
     }
     #leaderboard {
       margin-top: 30px;
@@ -99,13 +100,11 @@
       const cells = Array.from(slotGrid.children);
       let counts = {};
       cells.forEach(cell => {
-        const img = cell.querySelector("img");
-        if (img) {
-          counts[img.src] = (counts[img.src] || 0) + 1;
-        }
+        const src = cell.querySelector("img").src;
+        counts[src] = (counts[src] || 0) + 1;
       });
       for (let sym in counts) {
-        if (counts[sym] >= 3) return 100; // Kazanma durumu
+        if (counts[sym] >= 3) return 100;
       }
       return 0;
     }
