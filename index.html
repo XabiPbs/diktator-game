@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Diktatör Slot Oyunu</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <title>Slotoken Slot Oyunu</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -21,136 +21,80 @@
       color: white;
       cursor: pointer;
     }
-    .slot-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-gap: 10px;
-      justify-content: center;
+    .wallet {
       margin-top: 20px;
-    }
-    .slot-cell {
-      width: 100px;
-      height: 100px;
-      background: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .slot-cell img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      animation: spin 0.6s ease-in-out;
-    }
-    @keyframes spin {
-      0% { transform: translateY(-150px); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateY(0); }
-    }
-    #leaderboard {
-      margin-top: 30px;
-      background: #222;
-      padding: 10px;
-      border-radius: 10px;
+      font-size: 16px;
+      color: #0f0;
     }
   </style>
 </head>
 <body>
-  <h1>🎰 Diktatör Slot</h1>
-  <h3 id="username">Hoş geldin!</h3>
-  <div class="slot-grid" id="slotGrid"></div>
-  <button id="spinBtn">🍀 Spin!</button>
-
-  <div id="leaderboard">
-    <h3>🏆 Liderlik Tablosu</h3>
-    <ol id="scoreList"></ol>
+  <h1>🎰 Slotoken Slot</h1>
+  <p>Spin atmak için 1 <strong>SLT</strong> gerekir.</p>
+  <div class="wallet">
+    Cüzdan: <span id="walletAddress">Bağlı değil</span>
   </div>
+  <button id="connectWallet">🔗 Cüzdan Bağla</button>
+  <button id="spinBtn" disabled>🍀 Spin (1 SLT)</button>
+  <div id="result"></div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    const user = tg.initDataUnsafe?.user;
-    const username = user ? user.first_name : "Misafir";
-    document.getElementById("username").textContent = `Hoş geldin, ${username}!`;
+    let web3;
+    let userAccount;
 
-    const slotGrid = document.getElementById("slotGrid");
-    const spinBtn = document.getElementById("spinBtn");
-
-    const symbols = [
-      { name: "dictator1", src: "img/dictator1.png", points: 100 },
-      { name: "dictator2", src: "img/dictator2.png", points: 50 },
-      { name: "dictator3", src: "img/dictator3.png", points: 40 },
-      { name: "dictator4", src: "img/dictator4.png", points: 30 },
-      { name: "dictator5", src: "img/dictator5.png", points: 20 },
-      { name: "dictator6", src: "img/dictator6.png", points: 10 }
+    const SLT_TOKEN_ADDRESS = "0x1234567890abcdef1234567890abcdef12345678"; // Test Token
+    const SLT_ABI = [
+      {
+        "constant": true,
+        "inputs": [{"name": "_owner", "type": "address"}],
+        "name": "balanceOf",
+        "outputs": [{"name": "balance", "type": "uint256"}],
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {"name": "_to", "type": "address"},
+          {"name": "_value", "type": "uint256"}
+        ],
+        "name": "transfer",
+        "outputs": [{"name": "success", "type": "bool"}],
+        "type": "function"
+      }
     ];
 
-    let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
-    let score = 0;
-
-    function drawGrid() {
-      slotGrid.innerHTML = "";
-      const results = [];
-      for (let i = 0; i < 9; i++) {
-        const cell = document.createElement("div");
-        cell.className = "slot-cell";
-        const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-        results.push(symbol);
-
-        const img = document.createElement("img");
-        img.src = symbol.src;
-        img.alt = symbol.name;
-        cell.appendChild(img);
-        slotGrid.appendChild(cell);
-      }
-      return results;
-    }
-
-    function calculateScore(results) {
-      const counts = {};
-      results.forEach(s => {
-        counts[s.name] = (counts[s.name] || 0) + 1;
-      });
-      for (let name in counts) {
-        if (counts[name] >= 3) {
-          const matchedSymbol = symbols.find(s => s.name === name);
-          return matchedSymbol.points;
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userAccount = accounts[0];
+          document.getElementById("walletAddress").textContent = userAccount;
+          web3 = new Web3(window.ethereum);
+          document.getElementById("spinBtn").disabled = false;
+        } catch (err) {
+          alert("Cüzdan bağlantısı reddedildi.");
         }
+      } else {
+        alert("Metamask tarayıcınızda yüklü değil.");
       }
-      return 0;
     }
 
-    function updateLeaderboard() {
-      const list = document.getElementById("scoreList");
-      list.innerHTML = "";
-      leaderboard.sort((a, b) => b.score - a.score);
-      leaderboard.forEach(entry => {
-        const li = document.createElement("li");
-        li.textContent = `${entry.name}: ${entry.score} puan`;
-        list.appendChild(li);
-      });
+    async function playSlot() {
+      const contract = new web3.eth.Contract(SLT_ABI, SLT_TOKEN_ADDRESS);
+      const balance = await contract.methods.balanceOf(userAccount).call();
+      const requiredSLT = web3.utils.toWei("1", "ether");
+
+      if (parseInt(balance) >= requiredSLT) {
+        await contract.methods.transfer("0xE87f61F042aFE174B93C10F2cCc15B65C51D8D47", requiredSLT)
+          .send({ from: userAccount });
+        document.getElementById("result").textContent = "🎉 Spin başarılı! Kazanç hesaplanıyor...";
+      } else {
+        document.getElementById("result").textContent = "😢 Yetersiz SLT bakiyesi.";
+      }
     }
 
-    spinBtn.addEventListener("click", () => {
-      const result = drawGrid();
-      const earned = calculateScore(result);
-      if (earned > 0) {
-        score += earned;
-        const existing = leaderboard.find(e => e.name === username);
-        if (existing) {
-          existing.score += earned;
-        } else {
-          leaderboard.push({ name: username, score: earned });
-        }
-        localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-        updateLeaderboard();
-      }
-    });
-
-    drawGrid();
-    updateLeaderboard();
+    document.getElementById("connectWallet").addEventListener("click", connectWallet);
+    document.getElementById("spinBtn").addEventListener("click", playSlot);
   </script>
 </body>
 </html>
