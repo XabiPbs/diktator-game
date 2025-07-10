@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Diktatör Slot Oyunu</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      text-align: center;
+      background: url('img/background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+    .game-container {
+      margin: 20px auto;
+      width: 420px;
+      height: 260px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      padding: 10px;
+      position: relative;
+    }
+    .slot {
+      display: flex;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .reel {
+      width: 72px;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      position: relative;
+    }
+    .symbols {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      width: 100%;
+      animation-timing-function: ease-in;
+    }
+    .symbol {
+      width: 72px;
+      height: 86px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #e91e63;
+      color: white;
+      cursor: pointer;
+    }
+    #score {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎰 Diktatör Slot</h1>
+  <div class="game-container">
+    <div class="slot" id="slot">
+      <div class="reel" id="reel0"></div>
+      <div class="reel" id="reel1"></div>
+      <div class="reel" id="reel2"></div>
+      <div class="reel" id="reel3"></div>
+      <div class="reel" id="reel4"></div>
+    </div>
+  </div>
+  <button onclick="spin()">Spin</button>
+  <div id="score">Puan: 0</div>
+
+  <script>
+    const reels = [
+      document.getElementById("reel0"),
+      document.getElementById("reel1"),
+      document.getElementById("reel2"),
+      document.getElementById("reel3"),
+      document.getElementById("reel4")
+    ];
+
+    const items = [
+      { name: "dictator1.png", point: 100 },
+      { name: "dictator2.png", point: 80 },
+      { name: "dictator3.png", point: 60 },
+      { name: "dictator4.png", point: 40 },
+      { name: "dictator5.png", point: 20 },
+      { name: "dictator6.png", point: 10 },
+      { name: "scater.png", point: 0 }
+    ];
+
+    let totalScore = 0;
+    let globalSpinCount = 0;
+
+    function getRandomItem() {
+      let weighted = [];
+      items.forEach(item => {
+        const weight = item.name === "scater.png" ? 1 : 20;
+        for (let i = 0; i < weight; i++) weighted.push(item);
+      });
+      return weighted[Math.floor(Math.random() * weighted.length)];
+    }
+
+    function spin() {
+      globalSpinCount++;
+      let stopDelays = [1000, 1300, 1600, 1900, 2200];
+      let grid = Array(5).fill().map(() => Array(3).fill(null));
+
+      reels.forEach((reel, i) => {
+        const symbolsDiv = document.createElement("div");
+        symbolsDiv.className = "symbols";
+        for (let j = 0; j < 9; j++) {
+          const item = getRandomItem();
+          const img = document.createElement("img");
+          img.className = "symbol";
+          img.src = `img/${item.name}`;
+          symbolsDiv.appendChild(img);
+          if (j >= 3 && j <= 5) grid[i][j - 3] = item;
+        }
+        symbolsDiv.style.top = "-258px";
+        reel.innerHTML = "";
+        reel.appendChild(symbolsDiv);
+        symbolsDiv.animate(
+          [ { top: "-516px" }, { top: "0px" } ],
+          { duration: stopDelays[i], fill: "forwards" }
+        );
+      });
+
+      setTimeout(() => {
+        const winData = checkWin(grid);
+        totalScore += winData.score;
+        document.getElementById("score").innerText = `Puan: ${totalScore}`;
+
+        if (winData.scaterCount === 3) {
+          alert("🎉 Özel Oyun Açıldı!");
+        }
+      }, 2300);
+    }
+
+    function checkWin(grid) {
+      let score = 0;
+      let scaterCount = 0;
+
+      for (let y = 0; y < 3; y++) {
+        let chain = [];
+        for (let x = 0; x < 5; x++) {
+          const current = grid[x][y];
+          if (!current) break;
+          if (x === 0 || current.name === grid[x - 1][y].name) {
+            chain.push(current);
+          } else break;
+        }
+        if (chain.length >= 3) {
+          let base = chain[0].point;
+          let multiplier = chain.length === 4 ? 2 : chain.length === 5 ? 10 : 1;
+          score += base * multiplier;
+        }
+      }
+
+      grid.flat().forEach(cell => {
+        if (cell.name === "scater.png") scaterCount++;
+      });
+
+      if (scaterCount >= 3 && globalSpinCount < 500) scaterCount = 2;
+      else if (globalSpinCount >= 500) scaterCount = 3;
+
+      return { score, scaterCount };
+    }
+  </script>
+</body>
+</html>
