@@ -49,27 +49,243 @@
     .symbol {
       width: 72px;
       height: 86px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 16px;
       border: none;
       border-radius: 8px;
       background-color: #e91e63;
       color: white;
       cursor: pointer;
+      transition: all 0.3s;
     }
-    #score {
-      margin-top: 20px;
-      font-size: 20px;
+    button:hover {
+      background-color: #c2185b;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .score-container {
+      margin-top: 15px;
+      font-size: 18px;
       font-weight: bold;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    #bonus-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 100;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid gold;
+    }
+    .bonus-game {
+      text-align: center;
+    }
+    .bonus-options {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    .bonus-option {
+      width: 50px;
+      height: 50px;
+      background-color: #e91e63;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+    .bonus-option:hover {
+      transform: scale(1.1);
+    }
+    .win-line {
+      position: absolute;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .win-line svg {
+      overflow: visible;
+    }
+    .shop-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 100;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid gold;
+    }
+    .shop {
+      text-align: center;
+    }
+    .shop-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+    .bet-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .bet-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      background-color: #e91e63;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .bet-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .sticky-wild {
+      animation: pulse 1s infinite alternate;
+      border: 2px solid gold;
+      border-radius: 5px;
+    }
+    @keyframes pulse {
+      from { opacity: 0.8; }
+      to { opacity: 1; }
+    }
+    .bet-amount {
+      min-width: 50px;
+      display: inline-block;
+    }
+    .close-btn {
+      margin-top: 15px;
+      width: 100%;
+    }
+    /* Yeni eklenen stiller */
+    .bonus-purchase-container {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 20;
+      border-radius: 12px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .bonus-purchase-options {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-top: 20px;
+    }
+    .bonus-purchase-option {
+      width: 80px;
+      height: 100px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    .bonus-purchase-option:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: #e91e63;
+    }
+    .bonus-purchase-option.selected {
+      border-color: gold;
+      background-color: rgba(255, 215, 0, 0.1);
+    }
+    .bonus-spins-info {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .auto-spin-info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 30;
     }
   </style>
 </head>
 <body>
   <h1>🎰 Diktatör Slot</h1>
   <div class="game-container">
+    <div id="bonus-purchase-container" class="bonus-purchase-container">
+      <h2>BONUS OYUN SATIN AL</h2>
+      <p>Kaç spinlik bonus oyun satın almak istersiniz?</p>
+      <div class="bonus-purchase-options">
+        <div class="bonus-purchase-option" data-spins="5" data-cost="500" onclick="selectBonusPurchase(this)">
+          <div style="font-size: 24px; font-weight: bold;">5 SPIN</div>
+          <div style="font-size: 14px; margin-top: 5px;">500₺</div>
+        </div>
+        <div class="bonus-purchase-option" data-spins="7" data-cost="700" onclick="selectBonusPurchase(this)">
+          <div style="font-size: 24px; font-weight: bold;">7 SPIN</div>
+          <div style="font-size: 14px; margin-top: 5px;">700₺</div>
+        </div>
+        <div class="bonus-purchase-option" data-spins="10" data-cost="1000" onclick="selectBonusPurchase(this)">
+          <div style="font-size: 24px; font-weight: bold;">10 SPIN</div>
+          <div style="font-size: 14px; margin-top: 5px;">1000₺</div>
+        </div>
+      </div>
+      <div class="bonus-spins-info" id="bonus-spins-info"></div>
+      <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button onclick="purchaseBonusGame()">Satın Al</button>
+        <button onclick="cancelBonusPurchase()">İptal</button>
+      </div>
+    </div>
     <div class="slot" id="slot">
       <div class="reel" id="reel0"></div>
       <div class="reel" id="reel1"></div>
@@ -77,11 +293,71 @@
       <div class="reel" id="reel3"></div>
       <div class="reel" id="reel4"></div>
     </div>
+    <div id="auto-spin-info" class="auto-spin-info" style="display: none;"></div>
   </div>
-  <button onclick="spin()">Spin</button>
-  <div id="score">Puan: 0</div>
+  
+  <div class="controls">
+    <button id="spin-button" onclick="spin()">Spin (<span id="bet-amount">10</span>₺)</button>
+    <button onclick="showBonusPurchaseOptions()">Bonus Oyun Satın Al</button>
+  </div>
+  
+  <div class="bet-controls">
+    <button class="bet-btn" onclick="changeBet(-1)" id="bet-down">-</button>
+    <div>Bahis: <span id="current-bet" class="bet-amount">10</span>₺</div>
+    <button class="bet-btn" onclick="changeBet(1)" id="bet-up">+</button>
+  </div>
+  
+  <div class="score-container">
+    <div id="balance">Bakiye: 2000₺</div>
+    <div id="last-win">Son Kazanç: 0₺</div>
+  </div>
+
+  <!-- Bonus Oyunu -->
+  <div id="bonus-container">
+    <div class="bonus-game">
+      <h2>BONUS OYUNU!</h2>
+      <p>Kazanacağın ödülü seç:</p>
+      <div class="bonus-options">
+        <div class="bonus-option" onclick="selectBonus(1)">1</div>
+        <div class="bonus-option" onclick="selectBonus(2)">2</div>
+        <div class="bonus-option" onclick="selectBonus(3)">3</div>
+      </div>
+      <p id="bonus-result"></p>
+      <button onclick="closeBonus()" class="close-btn">Ödülü Al</button>
+    </div>
+  </div>
+
+  <!-- Mağaza -->
+  <div id="shop-container">
+    <div class="shop">
+      <h2>BONUS OYUN SATIN AL</h2>
+      <div class="shop-item">
+        <div>
+          <h3>Yapışkan Wild (1 Tur)</h3>
+          <p>Sonraki turda 1 wild sabit kalır</p>
+        </div>
+        <button onclick="buyPowerup('sticky_wild_1', 200)">200₺</button>
+      </div>
+      <div class="shop-item">
+        <div>
+          <h3>Yapışkan Wild (3 Tur)</h3>
+          <p>Sonraki 3 turda 1 wild sabit kalır</p>
+        </div>
+        <button onclick="buyPowerup('sticky_wild_3', 500)">500₺</button>
+      </div>
+      <div class="shop-item">
+        <div>
+          <h3>2x Çarpanlı Wild</h3>
+          <p>Sonraki turda wild'lar 2x çarpan uygular</p>
+        </div>
+        <button onclick="buyPowerup('wild_2x', 300)">300₺</button>
+      </div>
+      <button onclick="closeShop()" class="close-btn">Kapat</button>
+    </div>
+  </div>
 
   <script>
+    // Oyun Değişkenleri
     const reels = [
       document.getElementById("reel0"),
       document.getElementById("reel1"),
@@ -89,6 +365,25 @@
       document.getElementById("reel3"),
       document.getElementById("reel4")
     ];
+    const spinButton = document.getElementById("spin-button");
+    const betUpBtn = document.getElementById("bet-up");
+    const betDownBtn = document.getElementById("bet-down");
+    const bonusPurchaseContainer = document.getElementById("bonus-purchase-container");
+    const autoSpinInfo = document.getElementById("auto-spin-info");
+
+    // Sembol görselleri
+    const symbolImages = {
+      "dictator1.png": "url('img/dictator1.png')",
+      "dictator2.png": "url('img/dictator2.png')",
+      "dictator3.png": "url('img/dictator3.png')",
+      "dictator4.png": "url('img/dictator4.png')",
+      "dictator5.png": "url('img/dictator5.png')",
+      "dictator6.png": "url('img/dictator6.png')",
+      "scater.png": "url('img/scater.png')",
+      "wild.png": "url('img/wild.png')",
+      "wild2.png": "url('img/wild2.png')",
+      "wild3.png": "url('img/wild3.png')"
+    };
 
     const items = [
       { name: "dictator1.png", point: 100 },
@@ -97,86 +392,513 @@
       { name: "dictator4.png", point: 40 },
       { name: "dictator5.png", point: 20 },
       { name: "dictator6.png", point: 10 },
-      { name: "scater.png", point: 0 }
+      { name: "scater.png", point: 0, isScatter: true },
+      { name: "wild.png", point: 0, isWild: true, multiplier: 1 },
+      { name: "wild2.png", point: 0, isWild: true, multiplier: 2 },
+      { name: "wild3.png", point: 0, isWild: true, multiplier: 3 }
     ];
 
-    let totalScore = 0;
+    // Bahis seviyeleri
+    const betLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 25, 30, 35, 40, 45, 50];
+    
+    // Oyun Durumu
+    let gameBalance = 2000;
+    let lastWin = 0;
     let globalSpinCount = 0;
+    let bonusWinAmount = 0;
+    let currentBetIndex = 9; // 10₺ başlangıç bahsi
+    let currentBet = betLevels[currentBetIndex];
+    let selectedBonusPurchase = null;
+    let autoSpinCount = 0;
+    let autoSpinInterval = null;
+    
+    // Güçlendirmeler
+    let activePowerups = {
+      stickyWilds: [], // {reelIndex, symbolIndex, remainingSpins, multiplier}
+      wildMultiplier: 1,
+      stickyWildCount: 0
+    };
+    
+    // Ödeme Hatları
+    const paylines = [
+      [0,0,0,0,0], [1,1,1,1,1], [2,2,2,2,2],
+      [0,1,2,1,0], [2,1,0,1,2], [0,0,1,2,2],
+      [2,2,1,0,0], [1,0,0,0,1], [1,2,2,2,1],
+      [0,1,0,1,0], [2,1,2,1,2], [1,0,1,0,1],
+      [1,2,1,2,1], [0,2,0,2,0], [2,0,2,0,2],
+      [0,1,1,1,0], [2,1,1,1,2], [1,1,0,1,1],
+      [1,1,2,1,1], [0,2,2,2,0], [2,0,0,0,2],
+      [0,0,2,0,0], [2,2,0,2,2], [1,0,2,0,1],
+      [1,2,0,2,1], [0,1,2,2,2], [2,1,0,0,0],
+      [0,2,1,2,0], [2,0,1,0,2], [1,1,1,0,0],
+      [1,1,1,2,2], [0,0,1,1,1], [2,2,1,1,1],
+      [0,2,2,0,0], [2,0,0,2,2], [0,0,0,2,2],
+      [2,2,2,0,0], [0,2,0,0,2], [2,0,2,2,0],
+      [1,2,1,0,1]
+    ];
 
+    // UI Güncelleme
+    function updateUI() {
+      document.getElementById("balance").innerText = `Bakiye: ${gameBalance}₺`;
+      document.getElementById("last-win").innerText = `Son Kazanç: ${lastWin}₺`;
+      document.getElementById("current-bet").innerText = currentBet;
+      document.getElementById("bet-amount").innerText = currentBet;
+      
+      // Buton durumlarını güncelle
+      spinButton.disabled = gameBalance < currentBet || autoSpinCount > 0;
+      betUpBtn.disabled = currentBetIndex >= betLevels.length - 1 || autoSpinCount > 0;
+      betDownBtn.disabled = currentBetIndex <= 0 || autoSpinCount > 0;
+      
+      if (gameBalance < currentBet) {
+        spinButton.textContent = "Yetersiz Bakiye";
+      } else if (autoSpinCount > 0) {
+        spinButton.textContent = `Otomatik Spin (${autoSpinCount} kaldı)`;
+      } else {
+        spinButton.textContent = `Spin (${currentBet}₺)`;
+      }
+    }
+
+    // Bahis Ayarlama
+    function changeBet(change) {
+      const newIndex = currentBetIndex + change;
+      if (newIndex >= 0 && newIndex < betLevels.length) {
+        currentBetIndex = newIndex;
+        currentBet = betLevels[currentBetIndex];
+        updateUI();
+      }
+    }
+
+    // Rastgele Sembol Üretme
     function getRandomItem() {
       let weighted = [];
       items.forEach(item => {
-        const weight = item.name === "scater.png" ? 1 : 20;
+        let weight = 20; // Normal semboller
+        if (item.isScatter) weight = 1;
+        else if (item.isWild) weight = 5 - item.multiplier; // Daha yüksek çarpanlı wild'lar daha nadir
+        
+        // Aktif güçlendirmeler
+        if (item.isWild && activePowerups.wildMultiplier > 1) {
+          weight *= 2;
+        }
+        
         for (let i = 0; i < weight; i++) weighted.push(item);
       });
       return weighted[Math.floor(Math.random() * weighted.length)];
     }
 
+    // Spin İşlemi
     function spin() {
+      if (gameBalance < currentBet || autoSpinCount > 0) return;
+      
+      // Spin maliyetini düş
+      gameBalance -= currentBet;
+      updateUI();
+      
       globalSpinCount++;
       let stopDelays = [1000, 1300, 1600, 1900, 2200];
       let grid = Array(5).fill().map(() => Array(3).fill(null));
 
-      reels.forEach((reel, i) => {
+      // Önceki kazanç çizgilerini temizle
+      document.querySelectorAll('.win-line').forEach(el => el.remove());
+
+      // Spin butonunu devre dışı bırak
+      spinButton.disabled = true;
+      spinButton.textContent = "Dönüyor...";
+
+      // Yapışkan wild'ları işle
+      processStickyWilds(grid);
+
+      reels.forEach((reel, reelIndex) => {
         const symbolsDiv = document.createElement("div");
         symbolsDiv.className = "symbols";
+        
         for (let j = 0; j < 9; j++) {
-          const item = getRandomItem();
-          const img = document.createElement("img");
-          img.className = "symbol";
-          img.src = `img/${item.name}`;
-          symbolsDiv.appendChild(img);
-          if (j >= 3 && j <= 5) grid[i][j - 3] = item;
+          let item;
+          const symbolIndex = j - 3;
+          
+          // Orta 3 sembol için kontrol (görünen alan)
+          if (j >= 3 && j <= 5) {
+            // Bu pozisyonda yapışkan wild var mı?
+            const stickyWild = activePowerups.stickyWilds.find(sw => 
+              sw.reelIndex === reelIndex && sw.symbolIndex === symbolIndex
+            );
+            
+            if (stickyWild) {
+              // Yapışkan wild'ı kullan
+              item = items.find(i => i.isWild && i.multiplier === stickyWild.multiplier);
+              stickyWild.remainingSpins--;
+              
+              // Ömrü biten wild'ları kaldır
+              if (stickyWild.remainingSpins <= 0) {
+                activePowerups.stickyWilds = activePowerups.stickyWilds.filter(sw => 
+                  !(sw.reelIndex === reelIndex && sw.symbolIndex === symbolIndex)
+                );
+              }
+            } else {
+              // Normal rastgele sembol
+              item = getRandomItem();
+            }
+            
+            // Grid'i güncelle
+            grid[reelIndex][symbolIndex] = item;
+          } else {
+            // Görünmeyen alanlar için rastgele sembol
+            item = getRandomItem();
+          }
+          
+          const symbolDiv = document.createElement("div");
+          symbolDiv.className = "symbol";
+          if (item.isWild && activePowerups.stickyWilds.some(sw => 
+              sw.reelIndex === reelIndex && 
+              (j-3) >= 0 && (j-3) <= 2 && 
+              sw.symbolIndex === (j-3)
+            )) {
+            symbolDiv.classList.add("sticky-wild");
+          }
+          symbolDiv.style.backgroundImage = symbolImages[item.name];
+          symbolsDiv.appendChild(symbolDiv);
         }
+        
         symbolsDiv.style.top = "-258px";
         reel.innerHTML = "";
         reel.appendChild(symbolsDiv);
         symbolsDiv.animate(
           [ { top: "-516px" }, { top: "0px" } ],
-          { duration: stopDelays[i], fill: "forwards" }
+          { duration: stopDelays[reelIndex], fill: "forwards" }
         );
       });
 
       setTimeout(() => {
         const winData = checkWin(grid);
-        totalScore += winData.score;
-        document.getElementById("score").innerText = `Puan: ${totalScore}`;
+        lastWin = winData.score;
+        gameBalance += lastWin;
+        
+        updateUI();
 
-        if (winData.scaterCount === 3) {
-          alert("🎉 Özel Oyun Açıldı!");
+        if (winData.scaterCount >= 3) {
+          startBonusGame();
         }
+
+        // Kazanç çizgilerini göster
+        showWinLines(winData.winningLines, grid);
+        
+        // Otomatik spin kontrolü
+        if (autoSpinCount > 0) {
+          autoSpinCount--;
+          updateUI();
+          autoSpinInfo.textContent = `Otomatik Spin: ${autoSpinCount} kaldı`;
+          
+          if (autoSpinCount > 0) {
+            setTimeout(spin, 1000);
+          } else {
+            autoSpinInfo.style.display = "none";
+          }
+        } else {
+          // Spin butonunu tekrar aktif et
+          spinButton.disabled = gameBalance < currentBet;
+          spinButton.textContent = `Spin (${currentBet}₺)`;
+        }
+        
+        // Güçlendirme ömrünü azalt
+        updatePowerups();
       }, 2300);
     }
 
+    // Yapışkan Wild'ları İşleme
+    function processStickyWilds(grid) {
+      // Grid'deki yapışkan wild'ları işaretle
+      activePowerups.stickyWilds.forEach(sw => {
+        if (grid[sw.reelIndex] && grid[sw.reelIndex][sw.symbolIndex]) {
+          const wildItem = items.find(i => i.isWild && i.multiplier === sw.multiplier);
+          grid[sw.reelIndex][sw.symbolIndex] = wildItem;
+        }
+      });
+      
+      // Yeni yapışkan wild ekleme şansı
+      if (activePowerups.stickyWildCount > 0 && Math.random() < 0.7) {
+        const reelIndex = Math.floor(Math.random() * 5);
+        const symbolIndex = Math.floor(Math.random() * 3);
+        
+        if (!grid[reelIndex][symbolIndex]?.isWild) {
+          const multiplier = activePowerups.wildMultiplier > 1 ? activePowerups.wildMultiplier : 1;
+          activePowerups.stickyWilds.push({
+            reelIndex,
+            symbolIndex,
+            remainingSpins: activePowerups.stickyWildCount,
+            multiplier
+          });
+          activePowerups.stickyWildCount = 0;
+        }
+      }
+    }
+
+    // Güçlendirmeleri Güncelleme
+    function updatePowerups() {
+      // Wild çarpanını sıfırla (geçici güçlendirme)
+      if (activePowerups.wildMultiplier > 1) {
+        activePowerups.wildMultiplier = 1;
+      }
+    }
+
+    // Kazanç Kontrolü
     function checkWin(grid) {
       let score = 0;
       let scaterCount = 0;
+      let wildCount = 0;
+      let winningLines = [];
 
-      for (let y = 0; y < 3; y++) {
-        let chain = [];
-        for (let x = 0; x < 5; x++) {
-          const current = grid[x][y];
-          if (!current) break;
-          if (x === 0 || current.name === grid[x - 1][y].name) {
-            chain.push(current);
-          } else break;
-        }
-        if (chain.length >= 3) {
-          let base = chain[0].point;
-          let multiplier = chain.length === 4 ? 2 : chain.length === 5 ? 10 : 1;
-          score += base * multiplier;
-        }
-      }
-
+      // Scatter ve Wild kontrolü
       grid.flat().forEach(cell => {
-        if (cell.name === "scater.png") scaterCount++;
+        if (cell?.isScatter) scaterCount++;
+        if (cell?.isWild) wildCount++;
       });
 
+      // 40 yollu ödeme sistemi
+      paylines.forEach((line, lineIndex) => {
+        let symbolsInLine = [];
+        for (let i = 0; i < 5; i++) {
+          symbolsInLine.push(grid[i][line[i]]);
+        }
+        
+        // Wild'ları joker olarak kullanarak kazanç kontrolü
+        let firstSymbol = null;
+        let count = 0;
+        let wildMultiplier = 1;
+        
+        for (let i = 0; i < symbolsInLine.length; i++) {
+          const current = symbolsInLine[i];
+          if (!current) break;
+          if (current.isScatter) break; // Scatter'lar özel durum
+          
+          if (!firstSymbol && !current.isWild) {
+            firstSymbol = current;
+            count++;
+          } else if (current.isWild || (firstSymbol && current.name === firstSymbol?.name)) {
+            count++;
+            if (current.isWild && current.multiplier > wildMultiplier) {
+              wildMultiplier = current.multiplier;
+            }
+          } else {
+            break;
+          }
+        }
+        
+        if (count >= 3) {
+          const base = firstSymbol ? firstSymbol.point : items.find(item => !item?.isWild && !item?.isScatter).point;
+          const multiplier = getMultiplier(count) * wildMultiplier * activePowerups.wildMultiplier;
+          const lineWin = Math.floor(base * multiplier * (currentBet / 10)); // Bahis miktarına göre ölçekle
+          score += lineWin;
+          
+          if (lineWin > 0) {
+            winningLines.push({
+              lineIndex,
+              symbol: firstSymbol || items.find(item => !item?.isWild && !item?.isScatter),
+              count,
+              multiplier
+            });
+          }
+        }
+      });
+
+      // Scatter kontrolü (bonus oyunu için)
       if (scaterCount >= 3 && globalSpinCount < 500) scaterCount = 2;
       else if (globalSpinCount >= 500) scaterCount = 3;
 
-      return { score, scaterCount };
+      return { score, scaterCount, winningLines };
     }
+
+    function getMultiplier(count) {
+      switch(count) {
+        case 3: return 1;
+        case 4: return 2;
+        case 5: return 10;
+        default: return 0;
+      }
+    }
+
+    // Kazanç Çizgilerini Gösterme
+    function showWinLines(winningLines, grid) {
+      const container = document.querySelector('.game-container');
+      const reelWidth = 72;
+      const symbolHeight = 86;
+      
+      winningLines.forEach(win => {
+        const line = paylines[win.lineIndex];
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'win-line';
+        
+        // SVG oluştur
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        svg.style.position = 'absolute';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.overflow = 'visible';
+        
+        const path = document.createElementNS(svgNS, "path");
+        let pathData = '';
+        
+        for (let i = 0; i < 5; i++) {
+          const x = (i * reelWidth) + (reelWidth / 2);
+          const y = (line[i] * symbolHeight) + (symbolHeight / 2);
+          
+          if (i === 0) {
+            pathData = `M ${x} ${y}`;
+          } else {
+            pathData += ` L ${x} ${y}`;
+          }
+        }
+        
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', 'gold');
+        path.setAttribute('stroke-width', '3');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-dasharray', '5,5');
+        
+        svg.appendChild(path);
+        
+        // Çarpan bilgisini ekle
+        const text = document.createElementNS(svgNS, "text");
+        text.setAttribute('x', (2.5 * reelWidth));
+        text.setAttribute('y', (line[2] * symbolHeight) + symbolHeight + 5);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', 'gold');
+        text.setAttribute('font-size', '14');
+        text.setAttribute('font-weight', 'bold');
+        text.textContent = `${win.multiplier}x`;
+        svg.appendChild(text);
+        
+        lineDiv.appendChild(svg);
+        container.appendChild(lineDiv);
+      });
+    }
+
+    // Bonus Oyunu Fonksiyonları
+    function startBonusGame() {
+      document.getElementById('bonus-container').style.display = 'flex';
+      document.getElementById('bonus-result').innerText = '';
+      bonusWinAmount = 0;
+    }
+
+    function selectBonus(option) {
+      // Rastgele bonus ödülü (mevcut bahis x 10-30 arası)
+      bonusWinAmount = Math.floor(Math.random() * 20 + 10) * currentBet;
+      document.getElementById('bonus-result').innerText = `Kazandığın ödül: ${bonusWinAmount}₺!`;
+    }
+
+    function closeBonus() {
+      if (bonusWinAmount > 0) {
+        lastWin = bonusWinAmount;
+        gameBalance += bonusWinAmount;
+        updateUI();
+      }
+      document.getElementById('bonus-container').style.display = 'none';
+    }
+
+    // Bonus Oyun Satın Alma Fonksiyonları
+    function showBonusPurchaseOptions() {
+      bonusPurchaseContainer.style.display = 'flex';
+      document.getElementById('bonus-spins-info').innerText = '';
+      selectedBonusPurchase = null;
+      
+      // Tüm seçeneklerin seçili durumunu kaldır
+      document.querySelectorAll('.bonus-purchase-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+    }
+
+    function selectBonusPurchase(element) {
+      selectedBonusPurchase = {
+        spins: parseInt(element.getAttribute('data-spins')),
+        cost: parseInt(element.getAttribute('data-cost'))
+      };
+      
+      // Tüm seçeneklerin seçili durumunu kaldır
+      document.querySelectorAll('.bonus-purchase-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      // Seçili olanı işaretle
+      element.classList.add('selected');
+      
+      // Bilgi metnini güncelle
+      document.getElementById('bonus-spins-info').innerText = 
+        `${selectedBonusPurchase.spins} spinlik bonus oyun için ${selectedBonusPurchase.cost}₺ ödeyeceksiniz.`;
+    }
+
+    function purchaseBonusGame() {
+      if (!selectedBonusPurchase) {
+        alert("Lütfen bir bonus oyun seçeneği seçin!");
+        return;
+      }
+      
+      if (gameBalance < selectedBonusPurchase.cost) {
+        alert("Yetersiz bakiye!");
+        return;
+      }
+      
+      // Bakiyeden düş
+      gameBalance -= selectedBonusPurchase.cost;
+      
+      // Otomatik spin sayısını ayarla
+      autoSpinCount = selectedBonusPurchase.spins;
+      autoSpinInfo.textContent = `Otomatik Spin: ${autoSpinCount} kaldı`;
+      autoSpinInfo.style.display = "block";
+      
+      // UI'yı güncelle
+      updateUI();
+      
+      // Satın alma penceresini kapat
+      bonusPurchaseContainer.style.display = "none";
+      
+      // İlk spin'i başlat
+      setTimeout(spin, 500);
+    }
+
+    function cancelBonusPurchase() {
+      bonusPurchaseContainer.style.display = "none";
+    }
+
+    // Mağaza Fonksiyonları
+    function openShop() {
+      document.getElementById('shop-container').style.display = 'flex';
+    }
+
+    function closeShop() {
+      document.getElementById('shop-container').style.display = 'none';
+    }
+
+    function buyPowerup(type, cost) {
+      if (gameBalance < cost) {
+        alert("Yetersiz bakiye!");
+        return;
+      }
+      
+      gameBalance -= cost;
+      
+      switch(type) {
+        case 'sticky_wild_1':
+          activePowerups.stickyWildCount = 1;
+          alert("Sonraki turda 1 wild sembolü yapışkan olacak!");
+          break;
+        case 'sticky_wild_3':
+          activePowerups.stickyWildCount = 3;
+          alert("Sonraki 3 turda 1 wild sembolü yapışkan olacak!");
+          break;
+        case 'wild_2x':
+          activePowerups.wildMultiplier = 2;
+          alert("Sonraki turda wild'lar 2x çarpan uygulayacak!");
+          break;
+      }
+      
+      updateUI();
+      closeShop();
+    }
+
+    // Oyun başlangıcında UI'yı güncelle
+    updateUI();
   </script>
 </body>
 </html>
